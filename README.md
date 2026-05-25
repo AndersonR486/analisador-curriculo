@@ -18,12 +18,6 @@ Projeto Front-End para análise de currículos em PDF desenvolvido com HTML, CSS
 - PDF.js
 - Chart.js
 
-## Como executar
-1. Baixe o projeto
-2. Abra o arquivo `index.html`
-3. Faça upload de um currículo PDF
-4. Insira a descrição da vaga
-5. Clique em “Analisar Currículo”
 
 ## Objetivo
 Projeto criado para prática de Front-End, manipulação de PDF e simulação de sistemas ATS utilizados em recrutamento.
