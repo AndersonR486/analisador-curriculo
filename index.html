@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Resume Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <nav class="topbar" aria-label="Principal">
+                <a class="brand" href="#">
+                    <span class="brand-mark">ATS</span>
+                    <span class="brand-text">Resume Analyzer</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#upload">Upload</a></li>
+                    <li><a href="#results">Resultados</a></li>
+                    <li><a href="#tips">Dicas</a></li>
+                </ul>
+            </nav>
+
+            <section class="hero">
+                <article class="hero-copy">
+                    <p class="eyebrow">Projeto Front-End + ADS</p>
+                    <h1>Análise de currículos em PDF com compatibilidade para vaga</h1>
+                    <p class="hero-text">
+                        Envie um currículo em PDF, descreva a vaga desejada e receba uma leitura básica com
+                        score ATS, habilidades encontradas, lacunas, sugestões de melhoria e gráfico de conhecimentos.
+                    </p>
+                    <div class="hero-badges">
+                        <span>PDF.js</span>
+                        <span>Chart.js</span>
+                        <span>HTML5 semântico</span>
+                        <span>Responsivo</span>
+                    </div>
+                </article>
+
+                <aside class="hero-panel">
+                    <div class="hero-stat">
+                        <strong id="heroCompatibility">0%</strong>
+                        <span>Compatibilidade</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong id="heroAtsScore">0</strong>
+                        <span>Score ATS</span>
+                    </div>
+                    <div class="hero-stat">
+                        <strong id="heroSkillsCount">0</strong>
+                        <span>Skills mapeadas</span>
+                    </div>
+                </aside>
+            </section>
+        </div>
+    </header>
+
+    <main>
+        <section class="workspace" id="upload">
+            <div class="container layout-grid">
+                <section class="panel form-panel">
+                    <div class="section-heading">
+                        <h2>Enviar currículo e vaga</h2>
+                        <p>Faça o upload do PDF e descreva a vaga para começar a análise.</p>
+                    </div>
+
+                    <form id="analysisForm" class="analysis-form">
+                        <label class="dropzone" id="dropzone" for="resumeFile">
+                            <input type="file" id="resumeFile" accept=".pdf,application/pdf" hidden>
+                            <span class="dropzone-icon">⇪</span>
+                            <strong>Arraste seu currículo PDF aqui</strong>
+                            <small>ou clique para selecionar o arquivo</small>
+                        </label>
+
+                        <p class="file-feedback" id="fileFeedback">Nenhum arquivo selecionado.</p>
+
+                        <label class="field-label" for="jobDescription">Descrição da vaga</label>
+                        <textarea
+                            id="jobDescription"
+                            rows="7"
+                            placeholder="Exemplo: Desenvolvedor Front-End com HTML, CSS, JavaScript, React, Git, UX/UI e experiência com APIs REST."
+                        ></textarea>
+
+                        <button type="submit" class="primary-button" id="analyzeButton">Analisar Currículo</button>
+                    </form>
+
+                    <div class="loading-box" id="loadingBox" hidden>
+                        <div class="loading-spinner" aria-hidden="true"></div>
+                        <p>Lendo PDF e analisando compatibilidade com a vaga...</p>
+                    </div>
+
+                    <p class="message success-message" id="successMessage" hidden></p>
+                    <p class="message error-message" id="errorMessage" hidden></p>
+                </section>
+
+                <aside class="panel info-panel" id="tips">
+                    <div class="section-heading">
+                        <h2>O que o sistema avalia</h2>
+                        <p>Leitura automática do currículo com foco em uma vaga específica.</p>
+                    </div>
+
+                    <ul class="info-list">
+                        <li>Presença de palavras-chave da vaga no currículo</li>
+                        <li>Habilidades técnicas esperadas pelo mercado</li>
+                        <li>Compatibilidade básica com score ATS</li>
+                        <li>Sugestões de melhoria para deixar o currículo mais forte</li>
+                        <li>Mapa visual de conhecimentos com gráfico</li>
+                    </ul>
+
+                    <article class="mini-card">
+                        <h3>Áreas monitoradas</h3>
+                        <div class="skill-pills" id="trackedSkills">
+                            <span>HTML</span>
+                            <span>CSS</span>
+                            <span>JavaScript</span>
+                            <span>React</span>
+                            <span>Python</span>
+                            <span>SQL</span>
+                            <span>Git</span>
+                            <span>UX/UI</span>
+                        </div>
+                    </article>
+                </aside>
+            </div>
+        </section>
+
+        <section class="results-section" id="results">
+            <div class="container">
+                <div class="section-heading">
+                    <h2>Dashboard de análise</h2>
+                    <p>Resultados resumidos para entender rapidamente a aderência do currículo.</p>
+                </div>
+
+                <section class="summary-grid">
+                    <article class="summary-card highlight-card">
+                        <h3>Compatibilidade com a vaga</h3>
+                        <strong id="compatibilityPercent">0%</strong>
+                        <p id="compatibilityStatus">Aguardando análise.</p>
+                    </article>
+
+                    <article class="summary-card">
+                        <h3>Score ATS</h3>
+                        <strong id="atsScore">0</strong>
+                        <p id="atsMessage">Sem dados para análise.</p>
+                    </article>
+
+                    <article class="summary-card">
+                        <h3>Habilidades encontradas</h3>
+                        <strong id="foundCount">0</strong>
+                        <p>Tecnologias detectadas no currículo.</p>
+                    </article>
+
+                    <article class="summary-card">
+                        <h3>Habilidades faltantes</h3>
+                        <strong id="missingCount">0</strong>
+                        <p>Pontos que podem ser reforçados para a vaga.</p>
+                    </article>
+                </section>
+
+                <section class="progress-panel panel">
+                    <div class="progress-header">
+                        <h3>Barra de compatibilidade</h3>
+                        <span id="progressLabel">0%</span>
+                    </div>
+                    <div class="progress-track" aria-label="Barra de compatibilidade">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </section>
+
+                <section class="dashboard-grid">
+                    <article class="panel chart-panel">
+                        <div class="card-heading">
+                            <h3>Gráfico de conhecimentos</h3>
+                            <p>Radar com as áreas monitoradas pelo sistema.</p>
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </article>
+
+                    <article class="panel chart-panel">
+                        <div class="card-heading">
+                            <h3>Resumo da comparação</h3>
+                            <p>Distribuição entre match, gaps e score ATS.</p>
+                        </div>
+                        <div class="chart-wrap">
+                            <canvas id="summaryChart"></canvas>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="insights-grid">
+                    <article class="panel result-card">
+                        <div class="card-heading">
+                            <h3>Habilidades encontradas</h3>
+                            <p>Palavras-chave do currículo alinhadas à vaga.</p>
+                        </div>
+                        <ul id="foundSkillsList" class="result-list"></ul>
+                    </article>
+
+                    <article class="panel result-card">
+                        <div class="card-heading">
+                            <h3>Habilidades faltantes</h3>
+                            <p>Termos importantes da vaga que não aparecem com clareza.</p>
+                        </div>
+                        <ul id="missingSkillsList" class="result-list"></ul>
+                    </article>
+
+                    <article class="panel result-card">
+                        <div class="card-heading">
+                            <h3>Sugestões de melhoria</h3>
+                            <p>Recomendações para evoluir o currículo.</p>
+                        </div>
+                        <ul id="improvementList" class="result-list"></ul>
+                    </article>
+
+                    <article class="panel result-card">
+                        <div class="card-heading">
+                            <h3>Palavras-chave sugeridas</h3>
+                            <p>Termos relevantes para aumentar a aderência.</p>
+                        </div>
+                        <ul id="keywordsList" class="result-list"></ul>
+                    </article>
+                </section>
+
+                <section class="extra-grid">
+                    <article class="panel extra-card">
+                        <div class="card-heading">
+                            <h3>Texto extraído do currículo</h3>
+                            <p>Prévia da leitura automática do PDF.</p>
+                        </div>
+                        <p id="resumePreview" class="text-preview">O texto extraído aparecerá aqui.</p>
+                    </article>
+
+                    <aside class="panel extra-card">
+                        <div class="card-heading">
+                            <h3>Dicas para ATS</h3>
+                            <p>Boas práticas para melhorar a leitura por sistemas automatizados.</p>
+                        </div>
+                        <ul class="result-list static-list">
+                            <li>Use títulos claros como Experiência, Formação e Habilidades.</li>
+                            <li>Inclua tecnologias e ferramentas exatamente como a vaga pede.</li>
+                            <li>Adicione resultados mensuráveis sempre que possível.</li>
+                            <li>Evite excesso de imagens ou informações fora de contexto.</li>
+                        </ul>
+                    </aside>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p>Mini projeto de portfólio para análise de currículos com HTML, CSS e JavaScript.</p>
+            <p>Feito com PDF.js, Chart.js e boas práticas de front-end.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
